@@ -1,0 +1,22 @@
+{
+  "name": "dawn-diary",
+  "version": "1.0.0",
+  "description": "A simple diary you can talk to.",
+  "scripts": {
+    "dev": "wrangler dev --test-scheduled",
+    "deploy": "wrangler deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FormerProperty/dawn-diary.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FormerProperty/dawn-diary/issues"
+  },
+  "homepage": "https://github.com/FormerProperty/dawn-diary#readme",
+  "devDependencies": {
+    "wrangler": "^4.168.0"
+  },
+  "private": true,
+  "type": "module"
+}

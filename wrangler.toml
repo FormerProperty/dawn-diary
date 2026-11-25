@@ -1,0 +1,33 @@
+name = "dawn-diary"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dawn-diary"
+# Paste the Database ID from the Cloudflare dashboard here (see README, step 2).
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[triggers]
+# Every 5 minutes: checks whether any nudges are due.
+crons = ["*/5 * * * *"]
+
+[vars]
+OWNER_NAME = "Tanya"
+PARTNER_NAME = "Dawn"
+# Sent with push notifications so the push service knows who runs the app.
+PUSH_CONTACT = "https://diary.fletcher-park.co.uk"
+AI_MODEL = "claude-haiku-5-5"
+
+# Custom domain. Uncomment once fletcher-park.co.uk is on your Cloudflare account
+# (or add the domain in the dashboard instead: Worker > Settings > Domains & Routes).
+# routes = [{ pattern = "diary.fletcher-park.co.uk", custom_domain = true }]
+
+# Secrets (set in the dashboard, never in this file):
+#   APP_PASSPHRASE     the passphrase Tanya uses to sign in
+#   ANTHROPIC_API_KEY  for understanding what is said or typed

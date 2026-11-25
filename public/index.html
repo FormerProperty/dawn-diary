@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f5c5c">
+  <title>Diary</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <!-- Sign in (Tanya's phone, first time only) -->
+  <section id="login" class="screen" hidden>
+    <div class="login-box">
+      <img src="/icons/icon-192.png" alt="" width="88" height="88">
+      <h1>Diary</h1>
+      <form id="login-form">
+        <label for="passphrase">Passphrase</label>
+        <input id="passphrase" type="password" autocomplete="current-password" required>
+        <button class="btn primary big" type="submit">Sign in</button>
+        <p id="login-error" class="error" role="alert"></p>
+      </form>
+      <p class="muted">Setting up Dawn's phone? Use the link from Settings on Tanya's phone instead.</p>
+    </div>
+  </section>
+
+  <!-- Main diary -->
+  <section id="app" class="screen" hidden>
+    <header class="top">
+      <div>
+        <p class="today-label">Today is</p>
+        <h1 id="today-date"></h1>
+      </div>
+      <button id="open-settings" class="icon-btn" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3.3h-4l-.4 2.6c-.6.3-1.2.6-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.2 1.6 2 3.5 2.5-1c.5.4 1.1.7 1.7 1l.4 2.6h4l.4-2.6c.6-.3 1.2-.6 1.7-1l2.5 1 2-3.5zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" transform="translate(-1 0)"/></svg>
+      </button>
+    </header>
+    <p id="offline" class="banner" hidden>No connection. Showing the diary as it was last loaded.</p>
+    <main id="list" aria-live="polite"></main>
+
+    <div class="dock">
+      <form id="ask" class="ask" autocomplete="off">
+        <label class="visually-hidden" for="ask-input">Say or type something</label>
+        <input id="ask-input" type="text" enterkeyhint="send" placeholder="Type, or tap the mic">
+        <button class="btn send" type="submit" aria-label="Send">Go</button>
+      </form>
+      <div class="dock-row">
+        <button id="add-btn" class="btn secondary" type="button">+ Add</button>
+        <button id="mic" class="mic" type="button" aria-label="Tap and speak">
+          <svg viewBox="0 0 24 24" width="46" height="46" aria-hidden="true"><path fill="currentColor" d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-6a3.5 3.5 0 0 0-7 0v6A3.5 3.5 0 0 0 12 15zm6-3.5a1 1 0 1 0-2 0 4 4 0 0 1-8 0 1 1 0 1 0-2 0 6 6 0 0 0 5 5.9V20H8.5a1 1 0 1 0 0 2h7a1 1 0 1 0 0-2H13v-2.6a6 6 0 0 0 5-5.9z"/></svg>
+        </button>
+        <button id="week-btn" class="btn secondary" type="button">This week</button>
+      </div>
+      <p id="mic-status" class="mic-status" aria-live="assertive"></p>
+    </div>
+  </section>
+
+  <!-- Answers, confirmations and questions -->
+  <dialog id="sheet" class="sheet"><div id="sheet-body"></div></dialog>
+
+  <!-- Add or change an entry by hand -->
+  <dialog id="editor" class="sheet">
+    <form id="edit-form" method="dialog">
+      <h2 id="edit-title">Add to the diary</h2>
+      <label for="f-title">What is it?</label>
+      <input id="f-title" name="title" required placeholder="e.g. Physio">
+      <label for="f-date">Date</label>
+      <input id="f-date" name="date" type="date" required>
+      <div class="two">
+        <div><label for="f-start">Time <span class="muted">(optional)</span></label><input id="f-start" name="start_time" type="time"></div>
+        <div><label for="f-end">Until <span class="muted">(optional)</span></label><input id="f-end" name="end_time" type="time"></div>
+      </div>
+      <label for="f-location">Where <span class="muted">(optional)</span></label>
+      <input id="f-location" name="location" placeholder="e.g. Royal South Hants">
+      <label for="f-notes">Notes <span class="muted">(optional)</span></label>
+      <textarea id="f-notes" name="notes" rows="2" placeholder="e.g. Bring the letter"></textarea>
+      <p id="edit-error" class="error" role="alert"></p>
+      <div class="actions">
+        <button class="btn primary big" type="submit" value="save">Save</button>
+        <button class="btn secondary" type="button" id="edit-cancel">Cancel</button>
+        <button class="btn danger-outline" type="button" id="edit-delete" hidden>Remove</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Settings -->
+  <dialog id="settings" class="sheet">
+    <div class="settings">
+      <div class="sheet-head"><h2>Settings</h2><button class="btn secondary" id="settings-close" type="button">Done</button></div>
+
+      <h3>Install</h3>
+      <p class="muted" id="install-hint">To put the diary on the home screen, open Chrome's menu (three dots) and choose <b>Add to home screen</b> or <b>Install app</b>.</p>
+      <button class="btn secondary" id="install-btn" type="button" hidden>Install on this phone</button>
+
+      <h3>Reminders on this phone</h3>
+      <p id="push-status" class="muted"></p>
+      <button class="btn primary" id="push-on" type="button">Turn on reminders</button>
+      <div id="push-options">
+        <label class="row"><input type="checkbox" id="s-morning"> Morning list of today's things at <input type="time" id="s-morning-time"></label>
+        <label class="row"><input type="checkbox" id="s-evening"> Evening before, if there's something tomorrow, at <input type="time" id="s-evening-time"></label>
+        <label class="row"><input type="checkbox" id="s-soon"> About an hour before anything with a time</label>
+        <button class="btn secondary" id="push-test" type="button">Send a test reminder</button>
+      </div>
+
+      <h3>On this phone</h3>
+      <label class="row"><input type="checkbox" id="s-speak"> Read answers out loud</label>
+      <div class="row">Text size
+        <select id="s-size"><option value="normal">Normal</option><option value="large">Large</option><option value="xlarge">Extra large</option></select>
+      </div>
+
+      <div id="owner-only" hidden>
+        <h3>Set up <span class="partner-name">Dawn</span>'s phone</h3>
+        <p class="muted">Makes a link that signs her phone in. Open it on her phone in Chrome. It works once, within 48 hours.</p>
+        <button class="btn primary" id="make-link" type="button">Make a link</button>
+        <div id="link-box" hidden>
+          <input id="link-url" readonly>
+          <div class="actions-inline">
+            <button class="btn secondary" id="link-share" type="button">Share</button>
+            <button class="btn secondary" id="link-copy" type="button">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <h3>Recent changes</h3>
+      <ul id="activity" class="activity"></ul>
+
+      <h3>Account</h3>
+      <p class="muted" id="signed-in-as"></p>
+      <button class="btn danger-outline" id="sign-out" type="button">Sign out of this phone</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
