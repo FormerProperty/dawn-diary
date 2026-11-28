@@ -43,11 +43,11 @@ In the new Worker, go to **Settings > Variables and Secrets > Add**. Choose type
 - `ANTHROPIC_API_KEY`: your key from https://console.anthropic.com.
 
 ### 5. Add the web address
-In the Worker, go to **Settings > Domains & Routes > Add > Custom domain** and enter `diary.fletcher-park.co.uk`.
-This only works if `fletcher-park.co.uk` is managed in your Cloudflare account. If it's managed somewhere else, the app is still available on its `….workers.dev` address in the meantime.
+In the Worker, go to **Settings > Domains & Routes > Add > Custom domain** and enter `dawnsdiary.uk`.
+This only works if `dawnsdiary.uk` is managed in your Cloudflare account. If it's managed somewhere else, the app is still available on its `….workers.dev` address in the meantime.
 
 ### 6. Your phone
-1. Open https://diary.fletcher-park.co.uk in **Chrome** and sign in with the passphrase.
+1. Open https://dawnsdiary.uk in **Chrome** and sign in with the passphrase.
 2. Open Chrome's menu (three dots) and choose **Add to home screen** or **Install app**.
 3. Open the app from the home screen, go to Settings (the cog) and tap **Turn on reminders**. Then tap **Send a test reminder**.
 

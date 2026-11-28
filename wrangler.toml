@@ -20,12 +20,10 @@ crons = ["*/5 * * * *"]
 OWNER_NAME = "Tanya"
 PARTNER_NAME = "Dawn"
 # Sent with push notifications so the push service knows who runs the app.
-PUSH_CONTACT = "https://diary.fletcher-park.co.uk"
+PUSH_CONTACT = "https://dawnsdiary.uk"
 AI_MODEL = "claude-haiku-5-5"
 
-# Custom domain. Uncomment once fletcher-park.co.uk is on your Cloudflare account
-# (or add the domain in the dashboard instead: Worker > Settings > Domains & Routes).
-# routes = [{ pattern = "diary.fletcher-park.co.uk", custom_domain = true }]
+# Custom domain: dawnsdiary.uk is added in the dashboard (Worker > Settings > Domains & Routes).
 
 # Secrets (set in the dashboard, never in this file):
 #   APP_PASSPHRASE     the passphrase Tanya uses to sign in
