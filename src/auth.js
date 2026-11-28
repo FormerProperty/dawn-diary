@@ -92,6 +92,13 @@ export async function createLinkToken(env, userId) {
   return { token, expires };
 }
 
+/** Checks a one-time link without using it up (link previews must not consume it). */
+export async function peekLinkToken(env, token) {
+  const row = await env.DB.prepare(`SELECT user_id, expires_at, used_at FROM link_tokens WHERE token_hash = ?`).bind(await sha256(token)).first();
+  if (!row || row.used_at || Date.parse(row.expires_at) < Date.now()) return null;
+  return row.user_id;
+}
+
 /** Uses up a one-time link. Returns the user id, or null if invalid, used or expired. */
 export async function redeemLinkToken(env, token) {
   const hash = await sha256(token);

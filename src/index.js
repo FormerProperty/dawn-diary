@@ -3,7 +3,7 @@
 import { ensureSchema, userName } from './db.js';
 import {
   currentUser, createSession, sessionCookie, clearCookie, logout,
-  checkPassphrase, createLinkToken, redeemLinkToken,
+  checkPassphrase, createLinkToken, redeemLinkToken, peekLinkToken,
 } from './auth.js';
 import { listEvents, addEvent, updateEvent, deleteEvent, restoreEvent, recentActivity } from './events.js';
 import { interpret } from './ai.js';
@@ -150,16 +150,31 @@ export default {
       }
     }
 
-    // One-time link that signs a phone in.
+    // One-time link that signs a phone in. Opening it only shows a button; pressing the
+    // button signs in. That way, link previews in WhatsApp or Messages don't use it up.
     const link = url.pathname.match(/^\/link\/([A-Za-z0-9_-]{20,})$/);
     if (link) {
-      const userId = await redeemLinkToken(env, link[1]);
-      if (!userId) {
-        return new Response('<!doctype html><meta name=viewport content="width=device-width"><body style="font:20px system-ui;padding:2em">This link has already been used or has expired. Ask for a new one.</body>',
-          { status: 410, headers: { 'content-type': 'text/html; charset=utf-8' } });
+      const page = (inner, status = 200) => new Response(`<!doctype html><html lang="en-GB"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>Set up the diary</title><style>
+body{font:20px/1.4 system-ui,sans-serif;background:#f7f4ee;color:#17212b;margin:0;padding:3rem 1.25rem;text-align:center}
+img{border-radius:20px}button{font:inherit;font-weight:700;font-size:1.2rem;background:#0f5c5c;color:#fff;border:0;
+border-radius:999px;padding:1rem 2rem;min-height:4rem;width:100%;max-width:22rem;margin-top:1.5rem}</style></head>
+<body><img src="/icons/icon-192.png" alt="" width="96" height="96">${inner}</body></html>`,
+      { status, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store', 'x-robots-tag': 'noindex' } });
+      const gone = () => page('<h1>This link has already been used</h1><p>Ask for a new link from the diary settings.</p>', 410);
+
+      if (request.method === 'POST') {
+        const userId = await redeemLinkToken(env, link[1]);
+        if (!userId) return gone();
+        const token = await createSession(env, userId);
+        return new Response(null, { status: 303, headers: { location: '/?welcome=1', 'set-cookie': sessionCookie(token) } });
       }
-      const token = await createSession(env, userId);
-      return new Response(null, { status: 302, headers: { location: '/?welcome=1', 'set-cookie': sessionCookie(token) } });
+      const userId = await peekLinkToken(env, link[1]);
+      if (!userId) return gone();
+      const name = await userName(env, userId);
+      return page(`<h1>Hello ${name.replace(/[<>&"]/g, '')}</h1><p>Tap the button to set up your diary on this phone.</p>
+<form method="post"><button type="submit">Set up this phone</button></form>`);
     }
 
     return env.ASSETS.fetch(request);
