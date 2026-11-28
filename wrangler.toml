@@ -10,8 +10,7 @@ run_worker_first = true
 [[d1_databases]]
 binding = "DB"
 database_name = "dawn-diary"
-# Paste the Database ID from the Cloudflare dashboard here (see README, step 2).
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "7c7f25b4-f950-4b28-b296-64fca69298ff"
 
 [triggers]
 # Every 5 minutes: checks whether any nudges are due.
