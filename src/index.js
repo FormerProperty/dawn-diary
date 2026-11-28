@@ -31,6 +31,9 @@ async function api(request, env, url) {
 
   if (path === '/api/login' && method === 'POST') {
     const { passphrase } = await body(request);
+    if (!env.APP_PASSPHRASE) {
+      return fail("The app can't see a passphrase yet. In Cloudflare, APP_PASSPHRASE must be added under Settings > Variables and Secrets (not under Build), as a Secret.", 500);
+    }
     const r = await checkPassphrase(env, passphrase);
     if (r.locked) return fail('Too many tries. Please wait an hour and try again.', 429);
     if (!r.ok) return fail("That passphrase isn't right.", 401);
